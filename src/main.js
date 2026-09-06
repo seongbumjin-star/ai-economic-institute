@@ -2,10 +2,14 @@ import { siteConfig, navItems, fields, research, news, events, resources } from 
 
 const arrow = `<span aria-hidden="true">→</span>`;
 const contactRows = [
-  ['주소', siteConfig.contact.address], ['전화', siteConfig.contact.phone], ['이메일', siteConfig.contact.email],
+  ['문의', siteConfig.contact.name], ['전화', siteConfig.contact.phone],
+  ['주소', siteConfig.contact.address], ['이메일', siteConfig.contact.email],
 ].filter(([, value]) => value);
-const contactValue = ([label, value]) => label === '이메일'
-  ? `<a href="mailto:${value}">${value}</a>` : `<span>${value}</span>`;
+const contactValue = ([label, value]) => {
+  if (label === '전화') return `<a href="tel:${value.replaceAll('-', '')}">${value}</a>`;
+  if (label === '이메일') return `<a href="mailto:${value}">${value}</a>`;
+  return `<span>${value}</span>`;
+};
 const joinIsReady = !siteConfig.joinUrl.startsWith('#');
 const app = document.querySelector('#app');
 

@@ -12,3 +12,11 @@ test('운영 콘텐츠와 교체 가능한 설정을 제공한다',()=>{
   assert.ok(news.length > 0);
   assert.ok(resources.length > 0);
 });
+test('연구소 문의 정보를 제공한다',()=>{
+  assert.deepEqual(siteConfig.contact, {
+    name: '조한일(사무국장)',
+    phone: '010-2245-5250',
+    address: '천안시 서북구 두정동 899 두정빌딩 202-4호',
+    email: 'ai9988go@gmail.com',
+  });
+});
