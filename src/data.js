@@ -8,7 +8,12 @@ export const siteConfig = {
   representative: '서봉균',
   founder: '진성범',
   joinUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScrLQpMP33BUR6GLl6ap_ln45w_5b5UcwLo11nkURCJHRay9w/viewform?usp=header',
-  contact: { email: '', phone: '', address: '' },
+  contact: {
+    name: '조한일(사무국장)',
+    phone: '010-2245-5250',
+    address: '천안시 서북구 두정동 899 두정빌딩 202-4호',
+    email: 'ai9988go@gmail.com',
+  },
 };
 
 export const navItems = [
