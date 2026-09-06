@@ -34,6 +34,15 @@ test('Jekyll processing is disabled for GitHub Pages', async () => {
   await assert.doesNotReject(() => readFile('.nojekyll'));
 });
 
+test('official logo is a project-relative asset included in the production build', async () => {
+  const main = await readFile('src/main.js', 'utf8');
+  assert.equal(
+    [...main.matchAll(/<img src="\.\/assets\/ai-economy-institute-logo\.svg"/g)].length,
+    2,
+  );
+  await assert.doesNotReject(() => readFile('assets/ai-economy-institute-logo.svg'));
+});
+
 test('navigation targets exist and no root-relative URLs break the project path', async () => {
   const [main, data] = await Promise.all([
     readFile('src/main.js', 'utf8'),

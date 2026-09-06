@@ -15,7 +15,7 @@ const app = document.querySelector('#app');
 
 app.innerHTML = `
 <a class="skip" href="#main">본문 바로가기</a>
-<header class="header"><a class="brand" href="#top" aria-label="AI경제연구소 홈"><b>AI</b><span>경제연구소<small>AI ECONOMY INSTITUTE</small></span></a><button class="menu" aria-label="메뉴 열기" aria-expanded="false"><i></i><i></i><i></i></button><nav aria-label="주 메뉴">${navItems.map(([n,u])=>`<a href="${u}">${n}</a>`).join('')}</nav></header>
+<header class="header"><a class="brand" href="#top" aria-label="AI경제연구소 홈"><img src="./assets/ai-economy-institute-logo.svg" alt="AI경제연구소"></a><button class="menu" aria-label="메뉴 열기" aria-expanded="false"><i></i><i></i><i></i></button><nav aria-label="주 메뉴">${navItems.map(([n,u])=>`<a href="${u}">${n}</a>`).join('')}</nav></header>
 <main id="main">
  <section class="hero" id="top"><div class="orb o1"></div><div class="orb o2"></div><div class="grid"></div><div class="hero-inner"><p class="eyebrow">AI ECONOMY INSTITUTE</p><h1>AI경제연구소</h1><h2>AI로 산업을 혁신하고,<br>일자리를 지키며,<br><em>지속가능한 미래</em>를 만듭니다.</h2><p class="lead">기술의 가능성을 사람의 삶으로 연결하는 민간 정책연구 플랫폼</p><div class="actions"><a href="#about" class="btn light">연구소 소개 ${arrow}</a><a href="#research" class="btn outline">정책·연구 보기 ${arrow}</a><a href="${siteConfig.joinUrl}" class="text-link" target="_blank" rel="noopener">회원가입 ${arrow}</a></div></div><a class="scroll" href="#about" aria-label="연구소 소개로 이동">SCROLL <span></span></a></section>
 
@@ -33,7 +33,7 @@ app.innerHTML = `
 
  <section class="membership" id="membership"><p class="label">JOIN OUR NETWORK</p><h2>미래를 함께 연구하고<br>변화를 함께 만들어 주세요.</h2><p>연구소의 정책 제안과 새로운 소식을 가장 먼저 받아보세요.</p><a class="btn light" href="${siteConfig.joinUrl}" ${joinIsReady?'target="_blank" rel="noopener"':''}>회원가입 신청 ${arrow}</a>${joinIsReady?'':'<small>회원가입 신청 페이지를 준비하고 있습니다.</small>'}</section>
  </main>
- <footer id="contact"><div class="footer-top"><div><a class="brand inverse" href="#top"><b>AI</b><span>경제연구소<small>AI ECONOMY INSTITUTE</small></span></a><p>AI로 산업을 혁신하고, 일자리를 지키며,<br>지속가능한 미래를 만듭니다.</p></div><div class="contact-title"><span>CONTACT</span><h2>연구소 문의</h2></div></div><div class="footer-info"><div class="people"><span>대표 <b>${siteConfig.representative}</b></span><span>창립제안자 <b>${siteConfig.founder}</b></span></div>${contactRows.length?`<dl>${contactRows.map(row=>`<div><dt>${row[0]}</dt><dd>${contactValue(row)}</dd></div>`).join('')}</dl>`:'<p class="contact-note">주소·전화·이메일은 확정 후 안내하겠습니다.</p>'}<p>© 2026 AI경제연구소. All rights reserved.</p></div></footer>`;
+ <footer id="contact"><div class="footer-top"><div><a class="brand inverse" href="#top" aria-label="AI경제연구소 홈"><img src="./assets/ai-economy-institute-logo.svg" alt="AI경제연구소"></a><p>AI로 산업을 혁신하고, 일자리를 지키며,<br>지속가능한 미래를 만듭니다.</p></div><div class="contact-title"><span>CONTACT</span><h2>연구소 문의</h2></div></div><div class="footer-info"><div class="people"><span>대표 <b>${siteConfig.representative}</b></span><span>창립제안자 <b>${siteConfig.founder}</b></span></div>${contactRows.length?`<dl>${contactRows.map(row=>`<div><dt>${row[0]}</dt><dd>${contactValue(row)}</dd></div>`).join('')}</dl>`:'<p class="contact-note">주소·전화·이메일은 확정 후 안내하겠습니다.</p>'}<p>© 2026 AI경제연구소. All rights reserved.</p></div></footer>`;
 
 const menu = document.querySelector('.menu');
 menu.addEventListener('click',()=>{ const open=document.body.classList.toggle('nav-open'); menu.setAttribute('aria-expanded',String(open)); });
