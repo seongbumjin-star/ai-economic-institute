@@ -1,4 +1,3 @@
-import './style.css';
 import { siteConfig, navItems, fields, research, news, events } from './data.js';
 
 const arrow = `<span aria-hidden="true">→</span>`;

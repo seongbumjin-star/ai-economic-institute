@@ -17,6 +17,19 @@ test('entrypoint assets use paths relative to the deployed directory', async () 
   }
 });
 
+test('CSS is loaded by HTML instead of imported as a JavaScript module', async () => {
+  const [html, main] = await Promise.all([
+    readFile('index.html', 'utf8'),
+    readFile('src/main.js', 'utf8'),
+  ]);
+
+  assert.match(
+    html,
+    /<link\s+rel="stylesheet"\s+href="\.\/src\/style\.css"\s*\/>/,
+  );
+  assert.doesNotMatch(main, /import\s+['"]\.\/style\.css['"]/);
+});
+
 test('Jekyll processing is disabled for GitHub Pages', async () => {
   await assert.doesNotReject(() => readFile('.nojekyll'));
 });
