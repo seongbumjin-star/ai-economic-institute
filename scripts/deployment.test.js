@@ -33,3 +33,15 @@ test('CSS is loaded by HTML instead of imported as a JavaScript module', async (
 test('Jekyll processing is disabled for GitHub Pages', async () => {
   await assert.doesNotReject(() => readFile('.nojekyll'));
 });
+
+test('navigation targets exist and no root-relative URLs break the project path', async () => {
+  const [main, data] = await Promise.all([
+    readFile('src/main.js', 'utf8'),
+    import('../src/data.js'),
+  ]);
+
+  for (const [, target] of data.navItems) {
+    assert.match(main, new RegExp(`id=["']${target.slice(1)}["']`), `${target} target must exist`);
+  }
+  assert.doesNotMatch(main, /(?:src|href)=["']\/(?!\/)/);
+});
