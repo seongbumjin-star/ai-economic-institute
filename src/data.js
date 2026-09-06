@@ -7,7 +7,7 @@ export const siteConfig = {
   name: 'AI경제연구소',
   representative: '서봉균',
   founder: '진성범',
-  joinUrl: '#membership',
+  joinUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScrLQpMP33BUR6GLl6ap_ln45w_5b5UcwLo11nkURCJHRay9w/viewform?usp=header',
   contact: { email: '', phone: '', address: '' },
 };
 
