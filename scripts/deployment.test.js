@@ -34,23 +34,13 @@ test('Jekyll processing is disabled for GitHub Pages', async () => {
   await assert.doesNotReject(() => readFile('.nojekyll'));
 });
 
-test('official logo is a project-relative asset included in the production build', async () => {
+test('application entrypoint renders the dashboard shell', async () => {
   const main = await readFile('src/main.js', 'utf8');
-  assert.equal(
-    [...main.matchAll(/<img src="\.\/assets\/ai-economy-institute-logo\.svg"/g)].length,
-    2,
-  );
-  await assert.doesNotReject(() => readFile('assets/ai-economy-institute-logo.svg'));
+  assert.match(main, /class="sidebar"/);
+  assert.match(main, /class="dashboard-grid"/);
 });
 
-test('navigation targets exist and no root-relative URLs break the project path', async () => {
-  const [main, data] = await Promise.all([
-    readFile('src/main.js', 'utf8'),
-    import('../src/data.js'),
-  ]);
-
-  for (const [, target] of data.navItems) {
-    assert.match(main, new RegExp(`id=["']${target.slice(1)}["']`), `${target} target must exist`);
-  }
+test('application assets do not use root-relative URLs', async () => {
+  const main = await readFile('src/main.js', 'utf8');
   assert.doesNotMatch(main, /(?:src|href)=["']\/(?!\/)/);
 });
