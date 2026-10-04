@@ -1,40 +1,75 @@
-import { siteConfig, navItems, fields, research, news, events, resources } from './data.js';
+import { activity, materials as seedMaterials, schedule, tasks } from './data.js';
 
-const arrow = `<span aria-hidden="true">→</span>`;
-const contactRows = [
-  ['문의', siteConfig.contact.name], ['전화', siteConfig.contact.phone],
-  ['주소', siteConfig.contact.address], ['이메일', siteConfig.contact.email],
-].filter(([, value]) => value);
-const contactValue = ([label, value]) => {
-  if (label === '전화') return `<a href="tel:${value.replaceAll('-', '')}">${value}</a>`;
-  if (label === '이메일') return `<a href="mailto:${value}">${value}</a>`;
-  return `<span>${value}</span>`;
+const icons = {
+  home:'<svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9H15v-6H9v6H3z"/></svg>',
+  file:'<svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h5M9 12h6M9 16h6"/></svg>',
+  check:'<svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+  calendar:'<svg viewBox="0 0 24 24"><path d="M4 6h16v15H4zM8 3v6M16 3v6M4 11h16"/></svg>',
+  users:'<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M17 11a4 4 0 0 0 0-8M22 21v-2a4 4 0 0 0-3-3.87"/></svg>',
+  search:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>',
+  bell:'<svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>',
+  plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  dots:'<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>'
 };
-const joinIsReady = !siteConfig.joinUrl.startsWith('#');
+
+let materials = JSON.parse(localStorage.getItem('assembly-materials') || 'null') || seedMaterials;
+let activeFilter = '전체';
 const app = document.querySelector('#app');
 
 app.innerHTML = `
-<a class="skip" href="#main">본문 바로가기</a>
-<header class="header"><a class="brand" href="#top" aria-label="AI경제연구소 홈"><img src="./assets/ai-economy-institute-logo.svg" alt="AI경제연구소"></a><button class="menu" aria-label="메뉴 열기" aria-expanded="false"><i></i><i></i><i></i></button><nav aria-label="주 메뉴">${navItems.map(([n,u])=>`<a href="${u}">${n}</a>`).join('')}</nav></header>
-<main id="main">
- <section class="hero" id="top"><div class="orb o1"></div><div class="orb o2"></div><div class="grid"></div><div class="hero-inner"><p class="eyebrow">AI ECONOMY INSTITUTE</p><h1>AI경제연구소</h1><h2>AI로 산업을 혁신하고,<br>일자리를 지키며,<br><em>지속가능한 미래</em>를 만듭니다.</h2><p class="lead">기술의 가능성을 사람의 삶으로 연결하는 민간 정책연구 플랫폼</p><div class="actions"><a href="#about" class="btn light">연구소 소개 ${arrow}</a><a href="#research" class="btn outline">정책·연구 보기 ${arrow}</a><a href="${siteConfig.joinUrl}" class="text-link" target="_blank" rel="noopener">회원가입 ${arrow}</a></div></div><a class="scroll" href="#about" aria-label="연구소 소개로 이동">SCROLL <span></span></a></section>
+<aside class="sidebar">
+  <a class="logo" href="#"><span>의</span><strong>의정온</strong><small>의정자료 관리</small></a>
+  <nav>
+    <p>WORKSPACE</p>
+    <button class="nav-item active" data-view="dashboard">${icons.home}<span>대시보드</span></button>
+    <button class="nav-item" data-view="materials">${icons.file}<span>의정자료</span><b>${materials.length}</b></button>
+    <button class="nav-item" data-view="tasks">${icons.check}<span>업무 관리</span><b>3</b></button>
+    <button class="nav-item" data-view="schedule">${icons.calendar}<span>일정</span></button>
+    <p>TEAM</p>
+    <button class="nav-item" data-view="members">${icons.users}<span>구성원</span></button>
+  </nav>
+  <div class="storage"><div><span>저장 공간</span><b>68%</b></div><i><em></em></i><small>6.8GB / 10GB</small></div>
+  <div class="user"><span class="avatar">김</span><div><strong>김의원</strong><small>관리자</small></div><button aria-label="사용자 메뉴">${icons.dots}</button></div>
+</aside>
+<div class="shell">
+  <header><button class="mobile-menu" aria-label="메뉴 열기">☰</button><div class="global-search">${icons.search}<input aria-label="통합 검색" placeholder="자료, 업무, 일정을 검색하세요"/><kbd>⌘ K</kbd></div><button class="icon-button" aria-label="알림">${icons.bell}<i></i></button><button class="help">도움말</button></header>
+  <main>
+    <section class="welcome"><div><p>2026년 10월 4일 일요일</p><h1>안녕하세요, 김의원님 <span>👋</span></h1><p>오늘도 중요한 의정활동을 함께 준비해요.</p></div><button class="primary add-button">${icons.plus} 새 자료 만들기</button></section>
+    <section class="stats">
+      <article><span class="stat-icon violet">${icons.file}</span><div><p>전체 의정자료</p><strong>${materials.length}</strong><small><b>+4</b> 이번 주</small></div></article>
+      <article><span class="stat-icon coral">${icons.check}</span><div><p>진행 중인 업무</p><strong>8</strong><small><b>3건</b> 오늘 마감</small></div></article>
+      <article><span class="stat-icon blue">${icons.calendar}</span><div><p>이번 주 일정</p><strong>5</strong><small><b>2건</b> 오늘 예정</small></div></article>
+      <article><span class="stat-icon green">${icons.users}</span><div><p>함께하는 구성원</p><strong>4</strong><small>모두 활동 중</small></div></article>
+    </section>
+    <div class="dashboard-grid">
+      <section class="panel materials-panel"><div class="panel-head"><div><h2>최근 의정자료</h2><p>최근 업데이트된 자료를 확인하세요.</p></div><button class="view-all">전체보기 →</button></div><div class="filters">${['전체','국정감사','상임위','예산','보도자료'].map(x=>`<button data-filter="${x}" class="${x==='전체'?'active':''}">${x}</button>`).join('')}</div><div class="material-list"></div></section>
+      <aside class="right-column">
+        <section class="panel"><div class="panel-head"><div><h2>다가오는 일정</h2><p>놓치지 않도록 미리 확인하세요.</p></div><button class="mini-add" aria-label="일정 추가">+</button></div><div class="schedule-list">${schedule.map((x,i)=>`<article><div class="date ${i===0?'active':''}"><strong>${x.day}</strong><span>${x.weekday}</span></div><div><h3>${x.title}</h3><p>${x.time} · ${x.location}</p></div></article>`).join('')}</div><button class="wide-link">전체 일정 보기 <span>→</span></button></section>
+        <section class="panel"><div class="panel-head"><div><h2>내 업무</h2><p>오늘 할 일을 확인하세요.</p></div><button class="mini-add" aria-label="업무 추가">+</button></div><div class="task-list">${tasks.map(x=>`<label><input type="checkbox"><i></i><div><h3>${x.title}</h3><p class="${x.tone}">${x.meta}</p></div><span>${x.owner.slice(0,1)}</span></label>`).join('')}</div><button class="wide-link">업무 전체보기 <span>→</span></button></section>
+      </aside>
+      <section class="panel activity-panel"><div class="panel-head"><div><h2>최근 활동</h2><p>팀의 자료 업데이트 소식입니다.</p></div><button class="view-all">모두 보기 →</button></div><div class="activity-list">${activity.map(x=>`<article><span class="avatar ${x.color}">${x.initials}</span><div><p><strong>${x.name}</strong>님이 ${x.action}</p><h3>${x.target}</h3></div><time>${x.time}</time></article>`).join('')}</div></section>
+    </div>
+  </main>
+</div>
+<dialog><form method="dialog" id="material-form"><div class="modal-head"><div><h2>새 자료 만들기</h2><p>팀원과 함께 관리할 의정자료를 등록하세요.</p></div><button value="cancel" aria-label="닫기">×</button></div><label>자료 제목<input name="title" required placeholder="자료 제목을 입력하세요"></label><div class="form-row"><label>분류<select name="type"><option>국정감사</option><option>상임위</option><option>예산</option><option>보도자료</option><option>정책</option></select></label><label>담당자<select name="owner"><option>박서윤</option><option>이도현</option><option>최유진</option></select></label></div><label>관련 위원회<input name="committee" value="산업통상자원중소벤처기업위원회"></label><div class="modal-actions"><button value="cancel">취소</button><button class="primary" value="default">자료 만들기</button></div></form></dialog>
+<div class="toast" role="status">새 의정자료가 등록되었습니다.</div>`;
 
- <section class="about" id="about"><div class="about-art"><span>AI</span><i></i><p>TECHNOLOGY<br>FOR PEOPLE</p></div><div class="about-copy"><p class="label">ABOUT THE INSTITUTE</p><h2>기술보다 먼저,<br><strong>사람과 삶을 생각합니다.</strong></h2><p class="about-lead">AI경제연구소는 AI 기술 자체만을 연구하는 곳이 아니라, AI가 산업·경제·일자리·지역사회에 가져올 변화에 대응하고 사람 중심의 정책 대안을 연구·제안하는 민간 정책연구 플랫폼입니다.</p><dl><div><dt>대표</dt><dd>${siteConfig.representative}</dd></div><div><dt>창립제안자</dt><dd>${siteConfig.founder}</dd></div></dl><div class="about-points"><article><b>VISION</b><h3>사람을 위한 AI 전환</h3><p>기술 혁신의 성과가 산업과 지역, 모든 시민의 더 나은 삶으로 이어지는 미래를 지향합니다.</p></article><article><b>PURPOSE</b><h3>현실에 닿는 정책 대안</h3><p>현장의 변화와 목소리를 연구해 실행할 수 있는 공공·민간 정책으로 연결합니다.</p></article><article><b>ACTIVITY</b><h3>연구·제안·공론</h3><p>정책 연구와 보고서 발간, 포럼, 교육, 국내외 네트워크 협력을 이어갑니다.</p></article></div></div></section>
+const list = document.querySelector('.material-list');
+function renderMaterials() {
+  const filtered = activeFilter === '전체' ? materials : materials.filter(x => x.type === activeFilter);
+  list.innerHTML = filtered.slice(0, 5).map(x => `<article class="material-row" data-id="${x.id}"><button class="star ${x.starred?'on':''}" aria-label="즐겨찾기">${x.starred?'★':'☆'}</button><span class="file-type ${x.type}">${x.type.slice(0,2)}</span><div class="material-copy"><h3>${x.title}</h3><p>${x.committee} · ${x.date}</p></div><span class="status ${x.status}">${x.status}</span><div class="owner"><span>${x.owner.slice(0,1)}</span><small>${x.owner}<br>${x.updated}</small></div><button class="more" aria-label="더 보기">${icons.dots}</button></article>`).join('') || '<p class="empty">해당 분류의 자료가 없습니다.</p>';
+}
+renderMaterials();
 
- <section class="section fields"><div class="section-head"><div><p class="label">RESEARCH AREAS</p><h2>더 나은 전환을 위한<br><strong>6대 연구 분야</strong></h2></div><p>AI가 산업과 사회에 가져올 변화를 폭넓게 살피고,<br>누구도 소외되지 않는 구체적인 대안을 만듭니다.</p></div><div class="field-grid">${fields.map(([n,t,d,k])=>`<article class="field"><div><span>${n}</span><small>${k}</small></div><h3>${t}</h3><p>${d}</p><a href="#research" aria-label="${t} 관련 연구 보기">${arrow}</a></article>`).join('')}</div></section>
+document.querySelectorAll('[data-filter]').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelector('.filters .active').classList.remove('active'); btn.classList.add('active'); activeFilter = btn.dataset.filter; renderMaterials();
+}));
+list.addEventListener('click', e => { const star=e.target.closest('.star'); if(!star)return; const item=materials.find(x=>x.id===Number(star.closest('article').dataset.id)); item.starred=!item.starred; localStorage.setItem('assembly-materials',JSON.stringify(materials)); renderMaterials(); });
+document.querySelectorAll('.task-list input').forEach(x=>x.addEventListener('change',()=>x.closest('label').classList.toggle('done',x.checked)));
+document.querySelectorAll('.nav-item').forEach(btn=>btn.addEventListener('click',()=>{document.querySelector('.nav-item.active').classList.remove('active');btn.classList.add('active');document.querySelector('.sidebar').classList.remove('open')}));
+document.querySelector('.mobile-menu').addEventListener('click',()=>document.querySelector('.sidebar').classList.toggle('open'));
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();document.querySelector('.global-search input').focus()}});
 
- <section class="section research" id="research"><div class="section-title"><div><p class="label">RESEARCH & POLICY</p><h2>연구·정책</h2></div><p>산업과 삶의 변화를 읽고 정책의 방향을 제안합니다.</p></div><div class="research-list">${research.map(x=>`<article><div class="post-meta"><span>${x.category}</span><time>${x.date}</time></div><div><h3>${x.title}</h3><p>${x.desc}</p></div><a href="${x.link}" aria-label="${x.title} 자세히 보기">자세히 보기 ${arrow}</a></article>`).join('')}</div></section>
-
- <section class="section events" id="events"><div class="section-title"><div><p class="label">FORUM & EVENTS</p><h2>포럼·행사</h2></div><p>연구 성과와 현장의 지혜를 나누는 열린 공론장입니다.</p></div><div class="event-list">${events.map(x=>`<article class="${x.poster?'has-poster':''}">${x.poster?`<img src="${x.poster}" alt="${x.title} 포스터">`:''}<div class="date"><b>${x.day}</b><span>${x.month}</span></div><div><p>${x.type}</p><h3>${x.title}</h3><span>${x.dateTime}<br>${x.place}</span></div><a href="${x.link}">${x.status} ${arrow}</a></article>`).join('')}</div></section>
-
- <section class="section news" id="news"><div class="section-title"><div><p class="label">NEWS & STORIES</p><h2>활동소식</h2></div><p>연구소의 활동과 언론보도, 현장의 장면을 전합니다.</p></div><div class="news-grid">${news.map(x=>`<article class="${x.image?'with-image':'text-only'}">${x.image?`<img src="${x.image}" alt="">`:`<div class="news-mark" aria-hidden="true">AI<span>NEWS</span></div>`}<div class="news-copy"><p><time>${x.date}</time><b>${x.tag}</b></p><h3>${x.title}</h3><p>${x.desc}</p><a href="${x.link}" aria-label="${x.title} 자세히 보기">자세히 보기 ${arrow}</a></div></article>`).join('')}</div></section>
-
- <section class="section resources" id="resources"><div class="section-title"><div><p class="label">RESOURCE LIBRARY</p><h2>자료실</h2></div><p>정책자료, 연구보고서, 토론회 자료를 공유합니다.</p></div><div class="resource-list">${resources.map(x=>`<article><span>${x.category}</span><div><h3>${x.title}</h3><p>${x.date} · ${x.format}</p></div>${x.file?`<a href="${x.file}" download>다운로드 ${arrow}</a>`:`<span class="preparing">자료 준비 중</span>`}</article>`).join('')}</div></section>
-
- <section class="membership" id="membership"><p class="label">JOIN OUR NETWORK</p><h2>미래를 함께 연구하고<br>변화를 함께 만들어 주세요.</h2><p>연구소의 정책 제안과 새로운 소식을 가장 먼저 받아보세요.</p><a class="btn light" href="${siteConfig.joinUrl}" ${joinIsReady?'target="_blank" rel="noopener"':''}>회원가입 신청 ${arrow}</a>${joinIsReady?'':'<small>회원가입 신청 페이지를 준비하고 있습니다.</small>'}</section>
- </main>
- <footer id="contact"><div class="footer-top"><div><a class="brand inverse" href="#top" aria-label="AI경제연구소 홈"><img src="./assets/ai-economy-institute-logo.svg" alt="AI경제연구소"></a><p>AI로 산업을 혁신하고, 일자리를 지키며,<br>지속가능한 미래를 만듭니다.</p></div><div class="contact-title"><span>CONTACT</span><h2>연구소 문의</h2></div></div><div class="footer-info"><div class="people"><span>대표 <b>${siteConfig.representative}</b></span><span>창립제안자 <b>${siteConfig.founder}</b></span></div>${contactRows.length?`<dl>${contactRows.map(row=>`<div><dt>${row[0]}</dt><dd>${contactValue(row)}</dd></div>`).join('')}</dl>`:'<p class="contact-note">주소·전화·이메일은 확정 후 안내하겠습니다.</p>'}<p>© 2026 AI경제연구소. All rights reserved.</p></div></footer>`;
-
-const menu = document.querySelector('.menu');
-menu.addEventListener('click',()=>{ const open=document.body.classList.toggle('nav-open'); menu.setAttribute('aria-expanded',String(open)); });
-document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',()=>{document.body.classList.remove('nav-open');menu.setAttribute('aria-expanded','false')}));
+const dialog=document.querySelector('dialog'); const form=document.querySelector('#material-form');
+document.querySelector('.add-button').addEventListener('click',()=>dialog.showModal());
+form.addEventListener('submit',e=>{if(e.submitter?.value==='cancel')return; e.preventDefault(); if(!form.reportValidity())return; const fd=new FormData(form); materials.unshift({id:Date.now(),title:fd.get('title'),type:fd.get('type'),owner:fd.get('owner'),committee:fd.get('committee'),date:'2026.10.04',status:'작성중',updated:'방금 전',starred:false}); localStorage.setItem('assembly-materials',JSON.stringify(materials)); document.querySelector('.stats article:first-child strong').textContent=materials.length; dialog.close(); form.reset(); activeFilter='전체'; document.querySelector('.filters .active').classList.remove('active'); document.querySelector('[data-filter="전체"]').classList.add('active'); renderMaterials(); const toast=document.querySelector('.toast');toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2500);});
